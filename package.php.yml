@@ -1,0 +1,17 @@
+name: android-sdk-manager
+version: 1.0.0
+description: Anndroid SDK GUI manager
+
+deps:
+  jphp-core: '*'
+  jphp-zend-ext: '*'
+  jphp-gui-ext: '*'
+  jphp-compress-ext: '*'
+  jphp-json-ext: '*'
+
+plugins:
+- App
+sources:
+- src
+includes:
+- index.php
