@@ -171,7 +171,7 @@ class SDKTools
     {
         $p = $this->createProcess("--install " . str::join($packages, ";"))->inheritIO()->start();
         $p->getInput()->eachLine(function (string $line) use ($p) {
-            if ($line == "Accept? (y/N):")
+            if (str::startsWith($line, "Accept? (y/N):"))
             {
                 $p->getOutput()->write("y\n");
                 $p->getOutput()->flush();
@@ -193,7 +193,7 @@ class SDKTools
     {
         $p = $this->createProcess("--uninstall " . str::join($packages, ";"))->inheritIO()->start();
         $p->getInput()->eachLine(function (string $line) use ($p) {
-            if ($line == "Accept? (y/N):")
+            if (str::startsWith($line, "Accept? (y/N):"))
             {
                 $p->getOutput()->write("y\n");
                 $p->getOutput()->flush();
