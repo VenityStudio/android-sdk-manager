@@ -42,7 +42,7 @@ class SDKManager
 
         if (!$this->tools->toolsExists()) $this->tools->extractTools();
 
-        $this->tools->createProcess("--list")->inheritIO()->startAndWait();
+        var_dump($this->tools->list());
     }
 
     public function start()

@@ -7,8 +7,11 @@ use compress\ZipArchiveEntry;
 use php\io\File;
 use php\io\IOException;
 use php\io\Stream;
+use php\lang\IllegalStateException;
 use php\lang\System;
 use php\lib\fs;
+use php\lib\str;
+use php\util\Regex;
 
 class SDKTools
 {
@@ -72,5 +75,54 @@ class SDKTools
     public function toolsExists() : bool
     {
         return fs::isDir($this->path . "/tools/bin");
+    }
+
+    public function list()
+    {
+        $process = $this->createProcess("--list")->startAndWait();
+
+        if ($process->getExitValue() != 0) return;
+
+        $arr = str::split($process->getInput()->readAll(), "\n");
+
+        $installed = [];
+        $available  = [];
+
+        foreach ($arr as $line)
+        {
+            $line = str::replace(trim((new Regex('(  )+', Regex::CASE_INSENSITIVE,  $line))->replace(" ")), "  ", " ");
+
+            if (str::startsWith($line,"-------")) continue;
+            if (!$line) continue;
+            if ($line == "Path | Version | Description | Location") continue;
+            if ($line == "Path | Version | Description") continue;
+            if (str::contains($line, "Installed packages:")) continue;
+            if (str::contains($line, "Available Packages:")) continue;
+
+            $arr = explode(" | ", $line);
+
+            if (count($arr) == 1) continue;
+
+            if (count($arr) == 4)
+            {
+                $installed[] = [
+                    "package"     => $arr[0],
+                    "version"     => $arr[1],
+                    "description" => $arr[2],
+                    "location"    => $arr[3]
+                ];
+            } else if (count($arr) == 3) {
+                $available[] = [
+                    "package"     => $arr[0],
+                    "version"     => $arr[1],
+                    "description" => $arr[2]
+                ];
+            }
+        }
+
+        return [
+            "installed" => $installed,
+            "available" => $available
+        ];
     }
 }
