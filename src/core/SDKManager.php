@@ -6,7 +6,9 @@ namespace core;
 use php\gui\UXApplication;
 use php\gui\UXForm;
 use php\lang\System;
+use php\lang\Thread;
 use php\lib\str;
+use ui\Preloader;
 use ui\SDKUserInterface;
 
 class SDKManager
@@ -51,9 +53,10 @@ class SDKManager
         UXApplication::launch(function (UXForm $form) {
             $this->mainForm = $form;
 	        $this->mainForm->title = "SDK Manager";
-            $this->init();
 
             $this->mainForm->show();
+
+            $this->init();
         });
     }
 

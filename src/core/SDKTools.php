@@ -4,14 +4,18 @@ namespace core;
 
 use compress\ZipArchive;
 use compress\ZipArchiveEntry;
+use php\gui\UXLabel;
+use php\gui\UXList;
 use php\io\File;
 use php\io\IOException;
 use php\io\Stream;
 use php\lang\IllegalStateException;
 use php\lang\System;
+use php\lang\Thread;
 use php\lib\fs;
 use php\lib\str;
 use php\util\Regex;
+use ui\Preloader;
 
 class SDKTools
 {
@@ -53,6 +57,7 @@ class SDKTools
                 fs::copy($stream, $file);
             }
         });
+
     }
 
     /**
@@ -68,10 +73,6 @@ class SDKTools
 
         if ($this->toolsExists())
             return new OSProcess("{$prog} --sdk_root={$this->path} {$sdkToolsArgs}", $this->path, $this->getEnv());
-        else {
-            $this->extractTools();
-            return $this->createProcess($sdkToolsArgs);
-        }
     }
 
     /**
@@ -156,5 +157,59 @@ class SDKTools
     public function getPath(): string
     {
         return $this->path;
+    }
+
+
+    /**
+     * @param array $packages
+     * @return bool
+     * @throws IOException
+     * @throws IllegalStateException
+     * @throws \php\lang\IllegalArgumentException
+     */
+    public function install(array $packages) : bool
+    {
+        $p = $this->createProcess("--install " . str::join($packages, ";"))->inheritIO()->start();
+        $p->getInput()->eachLine(function (string $line) use ($p) {
+            if ($line == "Accept? (y/N):")
+            {
+                $p->getOutput()->write("y\n");
+                $p->getOutput()->flush();
+            }
+        });
+
+        return $p->getExitValue() == 0;
+    }
+
+
+    /**
+     * @param array $packages
+     * @return bool
+     * @throws IOException
+     * @throws IllegalStateException
+     * @throws \php\lang\IllegalArgumentException
+     */
+    public function uninstall(array $packages) : bool
+    {
+        $p = $this->createProcess("--uninstall " . str::join($packages, ";"))->inheritIO()->start();
+        $p->getInput()->eachLine(function (string $line) use ($p) {
+            if ($line == "Accept? (y/N):")
+            {
+                $p->getOutput()->write("y\n");
+                $p->getOutput()->flush();
+            }
+        });
+
+        return $p->getExitValue() == 0;
+    }
+
+
+    /**
+     * @return OSProcess
+     * @throws IOException
+     */
+    public function update()
+    {
+        return $this->createProcess("--update");
     }
 }
