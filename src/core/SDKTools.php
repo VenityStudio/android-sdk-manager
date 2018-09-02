@@ -45,10 +45,14 @@ class SDKTools
         });
     }
 
-    protected function createProcess($sdkToolsArgs) : OSProcess
+    public function createProcess($sdkToolsArgs) : OSProcess
     {
+        if (SDKManager::getInstance()->isWin())
+            $prog = $this->path . "/tools/bin/sdkmanager.bat";
+        else $prog = "bash " . $this->path . "/tools/bin/sdkmanager";
+
         if ($this->toolsExists())
-            return new OSProcess("sdkmanager --sdk_root={$this->path} {$sdkToolsArgs}", $this->path, $this->getEnv());
+            return new OSProcess("{$prog} --sdk_root={$this->path} {$sdkToolsArgs}", $this->path, $this->getEnv());
         else {
             $this->extractTools();
             return $this->createProcess($sdkToolsArgs);

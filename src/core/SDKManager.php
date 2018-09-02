@@ -41,6 +41,8 @@ class SDKManager
         $this->tools = new SDKTools(System::getProperty("user.home") . "/Android/sdk");
 
         if (!$this->tools->toolsExists()) $this->tools->extractTools();
+
+        $this->tools->createProcess("--list")->inheritIO()->startAndWait();
     }
 
     public function start()
