@@ -1,5 +1,5 @@
 {
-  "win" : {
+  "windows" : {
     "url" : "https://dl.google.com/android/repository/sdk-tools-windows-4333796.zip",
     "name" : "sdk-tools-win.zip"
   },

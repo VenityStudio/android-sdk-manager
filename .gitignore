@@ -1,3 +1,4 @@
 vendor/
 .idea/
+sdk-tools/
 package-lock.php.yml

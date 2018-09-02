@@ -1,2 +1,5 @@
 <?php 
-echo "Hello World\n";
+use core\SDKManager;
+
+$app = new SDKManager();
+$app->start();
