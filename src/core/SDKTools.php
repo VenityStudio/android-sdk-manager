@@ -15,8 +15,15 @@ use php\util\Regex;
 
 class SDKTools
 {
+    /**
+     * @var string
+     */
     private $path;
 
+    /**
+     * SDKTools constructor.
+     * @param string $sdkToolsPath
+     */
     public function __construct(string $sdkToolsPath)
     {
         $this->path = fs::abs($sdkToolsPath);
@@ -48,6 +55,11 @@ class SDKTools
         });
     }
 
+    /**
+     * @param $sdkToolsArgs
+     * @return OSProcess
+     * @throws IOException
+     */
     public function createProcess($sdkToolsArgs) : OSProcess
     {
         if (SDKManager::getInstance()->isWin())
@@ -62,6 +74,9 @@ class SDKTools
         }
     }
 
+    /**
+     * @return string[]
+     */
     public function getEnv()
     {
         $env = System::getEnv();
@@ -72,12 +87,21 @@ class SDKTools
         return $env;
     }
 
+    /**
+     * @return bool
+     */
     public function toolsExists() : bool
     {
         return fs::isDir($this->path . "/tools/bin");
     }
 
-    public function list()
+    /**
+     * @return array
+     * @throws IOException
+     * @throws IllegalStateException
+     * @throws \php\util\RegexException
+     */
+    public function list() : array
     {
         $process = $this->createProcess("--list")->startAndWait();
 
@@ -124,5 +148,13 @@ class SDKTools
             "installed" => $installed,
             "available" => $available
         ];
+    }
+
+    /**
+     * @return string
+     */
+    public function getPath(): string
+    {
+        return $this->path;
     }
 }

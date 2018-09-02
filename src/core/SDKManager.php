@@ -7,6 +7,7 @@ use php\gui\UXApplication;
 use php\gui\UXForm;
 use php\lang\System;
 use php\lib\str;
+use ui\SDKUserInterface;
 
 class SDKManager
 {
@@ -42,7 +43,7 @@ class SDKManager
 
         if (!$this->tools->toolsExists()) $this->tools->extractTools();
 
-        var_dump($this->tools->list());
+        (new SDKUserInterface())->buildUI();
     }
 
     public function start()
