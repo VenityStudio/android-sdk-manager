@@ -8,6 +8,7 @@ use php\gui\UXLabel;
 use php\gui\UXNode;
 use php\gui\UXParent;
 use php\gui\UXProgressBar;
+use php\gui\UXProgressIndicator;
 
 class Preloader extends UXAnchorPane
 {
@@ -22,7 +23,7 @@ class Preloader extends UXAnchorPane
     protected $label;
 
     /**
-     * @var UXProgressBar
+     * @var UXProgressIndicator
      */
     protected $indicator;
 
@@ -41,12 +42,12 @@ class Preloader extends UXAnchorPane
         $this->size = $pane->size;
         $this->visible = false;
         $this->position = [0, 0];
-        $this->opacity = 0.52;
+        $this->opacity = 0.9;
         $this->visible = false;
-        $this->indicator = $indicator = new UXProgressBar();
+        $this->indicator = $indicator = new UXProgressIndicator();
 
         $indicator->progress = -1;
-        $indicator->size = [100, 24];
+        $indicator->size = [50, 50];
 
         $this->label = $label = new UXLabel($text);
         $this->add($label);
@@ -79,13 +80,10 @@ class Preloader extends UXAnchorPane
         $this->label->y = $this->indicator->y + $this->indicator->height + 5;
     }
 
-    public function show(callable $callback = null)
+    public function show()
     {
         parent::show();
         $this->toFront();
-
-        if ($callback)
-            $callback($this->indicator);
     }
 
     static function hidePreloader(UXNode $pane)

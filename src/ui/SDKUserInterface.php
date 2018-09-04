@@ -141,19 +141,24 @@ class SDKUserInterface
 
         if (count($selected) > 0)
         {
-            new Preloader($this->form->layout, "installing ...");
 
-            (new Thread(function () use ($selected) {
-                if (!$this->tools->install($selected))
-                    UXApplication::runLater(function () {
-                        UXDialog::show("Error installing", "ERROR");
+            $p = new Preloader($this->form->layout, "installing ...");
+            $p->show();
+
+            (new Thread(function () use ($selected, $p) {
+                foreach ($selected as $value)
+                    $this->tools->install($value, function ($line) use ($p) {
+                        UXApplication::runLater(function () use ($line, $p) {
+                            $p->setText(substr($line, 42));
+                        });
                     });
 
-                $this->form->{"x-preloader"}->hide();
+                UXApplication::runLater(function () {
+                    $this->update();
+                    Preloader::hidePreloader($this->form->layout);
+                });
             }))->start();
         }
-
-        $this->update();
     }
 
     private function uninstallClick()
@@ -165,38 +170,45 @@ class SDKUserInterface
             if ($item['selected']) if ($item['selected']->selected) $selected[] = $item['data']['package'];
 
 
-        if (count($selected) > 0)
-        {
-            new Preloader($this->form->layout, "uninstalling ...");
+        $p = new Preloader($this->form->layout, "uninstalling ...");
+        $p->show();
 
-            (new Thread(function () use ($selected) {
-                if (!$this->tools->uninstall($selected))
-                    UXApplication::runLater(function () {
-                        UXDialog::show("Error uninstalling", "ERROR");
+        (new Thread(function () use ($p, $selected) {
+
+            foreach ($selected as $package)
+                $this->tools->uninstall($package)->getInput()->eachLine(function (string $line) use ($p) {
+                    UXApplication::runLater(function () use ($line, $p) {
+                        $p->setText(substr($line, 42));
                     });
+                });
 
-                $this->form->{"x-preloader"}->hide();
-            }))->start();
-
-        }
-
-        $this->update();
+            UXApplication::runLater(function () {
+                $this->update();
+                Preloader::hidePreloader($this->form->layout);
+            });
+        }))->start();
     }
 
     private function updateClick()
     {
-        (new Preloader($this->form->layout, "Updating ..."))->show();
+        $p = new Preloader($this->form->layout, "Updating ...");
+        $p->show();
 
-        (new Thread(function () {
-            $process = $this->tools->update()->inheritIO()->start();
-            $process->getInput()->eachLine(function (string $line) {
-                if (str::contains($line, "100%")) {
-                    echo "true";
+        (new Thread(function () use ($p) {
+            $process = $this->tools->update()->start();
+            $process->getInput()->eachLine(function (string $line) use ($p) {
+                UXApplication::runLater(function () use ($line, $p) {
+                    $p->setText(substr($line, 42));
+                });
+
+
+                if ($line == "[=======================================] 100% Computing updates...             ") {
+                    UXApplication::runLater(function () {
+                        $this->update();
+                        Preloader::hidePreloader($this->form->layout);
+                    });
                 }
             });
-
-            $this->update();
-            $this->form->{"x-preloader"}->hide();
         }))->start();
     }
 }

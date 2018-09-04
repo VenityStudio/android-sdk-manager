@@ -41,7 +41,7 @@ class SDKManager
 
     private function init()
     {
-        $this->tools = new SDKTools(System::getProperty("user.home") . "/Android/sdk");
+        $this->tools = new SDKTools($_ENV['ANDROID_HOME'] ?? (System::getProperty("user.home") . "/Android/Sdk"));
 
         if (!$this->tools->toolsExists()) $this->tools->extractTools();
 

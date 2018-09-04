@@ -67,25 +67,17 @@ class SDKTools
      */
     public function createProcess($sdkToolsArgs) : OSProcess
     {
-        if (SDKManager::getInstance()->isWin())
-            $prog = $this->path . "/tools/bin/sdkmanager.bat";
-        else $prog = "bash " . $this->path . "/tools/bin/sdkmanager";
+        $prog = $this->path . "/tools/bin/sdkmanager.bat";
+
+        if (SDKManager::getInstance()->isLinux() || SDKManager::getInstance()->isMac())
+            $prog = "bash " . $this->path . "/tools/bin/sdkmanager";
 
         if ($this->toolsExists())
-            return new OSProcess("{$prog} --sdk_root={$this->path} {$sdkToolsArgs}", $this->path, $this->getEnv());
-    }
-
-    /**
-     * @return string[]
-     */
-    public function getEnv()
-    {
-        $env = System::getEnv();
-
-        $env['PATH']         = $this->path . "/tools/bin" . File::PATH_SEPARATOR . $env['PATH'];
-        $env['ANDROID_HOME'] = $this->path;
-
-        return $env;
+            return new OSProcess("{$prog} --sdk_root={$this->path} {$sdkToolsArgs}", $this->path);
+        else {
+            $this->extractTools();
+            return $this->createProcess($sdkToolsArgs);
+        }
     }
 
     /**
@@ -161,46 +153,30 @@ class SDKTools
 
 
     /**
-     * @param array $packages
-     * @return bool
+     * @param string $package
+     * @param callable|null $eachLine
+     * @return int
      * @throws IOException
      * @throws IllegalStateException
-     * @throws \php\lang\IllegalArgumentException
      */
-    public function install(array $packages) : bool
+    public function install(string $package, callable $eachLine = null) : int
     {
-        $p = $this->createProcess("--install " . str::join($packages, ";"))->inheritIO()->start();
-        $p->getInput()->eachLine(function (string $line) use ($p) {
-            if (str::startsWith($line, "Accept? (y/N):"))
-            {
-                $p->getOutput()->write("y\n");
-                $p->getOutput()->flush();
-            }
+        $p = $this->createProcess("--install {$package}")->start();
+        $p->getInput()->eachLine(function (string $line) use ($p, $eachLine) {
+
+            $p->getOutput()->write("y\n");
+            $p->getOutput()->flush();
+
+            if ($eachLine)
+                $eachLine($line);
         });
 
-        return $p->getExitValue() == 0;
+        return $p->getExitValue();
     }
 
-
-    /**
-     * @param array $packages
-     * @return bool
-     * @throws IOException
-     * @throws IllegalStateException
-     * @throws \php\lang\IllegalArgumentException
-     */
-    public function uninstall(array $packages) : bool
+    public function uninstall(string $package)
     {
-        $p = $this->createProcess("--uninstall " . str::join($packages, ";"))->inheritIO()->start();
-        $p->getInput()->eachLine(function (string $line) use ($p) {
-            if (str::startsWith($line, "Accept? (y/N):"))
-            {
-                $p->getOutput()->write("y\n");
-                $p->getOutput()->flush();
-            }
-        });
-
-        return $p->getExitValue() == 0;
+        return $this->createProcess("--uninstall {$package}")->start();
     }
 
 
