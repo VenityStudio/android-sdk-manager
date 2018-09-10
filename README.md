@@ -5,7 +5,10 @@
 
 Download android sdk tools ``jppm download-tools`` and run ``jppm start``
 
-## screenshot
+## screenshots
 
 #### linux
 ![](https://raw.githubusercontent.com/VenityStudio/android-sdk-manager/master/images/linux.jpg)
+
+#### windows
+![](https://raw.githubusercontent.com/VenityStudio/android-sdk-manager/master/images/windows.jpg)
