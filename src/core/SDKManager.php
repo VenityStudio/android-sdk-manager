@@ -81,7 +81,7 @@ class SDKManager
      */
     public function isWin() : bool
     {
-        return Str::contains($this->OS, 'win');
+        return Str::contains($this->OS, 'Win');
     }
 
     /**

@@ -135,10 +135,9 @@ class SDKUserInterface
         $items = $this->table->items->toArray();
         $selected = [];
 
-        foreach ($items as $item)
-            if ($item['selected']) if ($item['selected']->selected) $selected[] = $item['data']['package'];
-
-
+        foreach ($this->table->selectedItems as $key => $value) {
+            $selected[] = $value['data']['package'];
+        };
         if (count($selected) > 0)
         {
 

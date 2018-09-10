@@ -96,12 +96,15 @@ class SDKTools
      */
     public function list() : array
     {
-        $process = $this->createProcess("--list")->startAndWait();
 
+        $process = $this->createProcess("--list")->start();
+        $scaner = new \php\util\Scanner($process->getInput());
+        while ($scaner->hasNextLine()){
+            $line = $scaner->nextLine();
+            
+            $arr[] = $line;
+        }
         if ($process->getExitValue() != 0) return;
-
-        $arr = str::split($process->getInput()->readAll(), "\n");
-
         $installed = [];
         $available  = [];
 
@@ -162,15 +165,19 @@ class SDKTools
     public function install(string $package, callable $eachLine = null) : int
     {
         $p = $this->createProcess("--install {$package}")->start();
-        $p->getInput()->eachLine(function (string $line) use ($p, $eachLine) {
+        $scaner = new \php\util\Scanner($p->getInput());
+        while ($scaner->hasNextLine()){
+            $line = $scaner->nextLine();
 
             $p->getOutput()->write("y\n");
-            $p->getOutput()->flush();
+            try {
+                $p->getOutput()->flush();
+            } catch (\Throwable $e){
+            }
 
             if ($eachLine)
                 $eachLine($line);
-        });
-
+        }
         return $p->getExitValue();
     }
 
