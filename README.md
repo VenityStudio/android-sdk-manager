@@ -3,6 +3,8 @@
 
 ## how to run ?
 
+Install [JPPM](https://github.com/jphp-group/jphp/releases) and JDK 8
+
 Download android sdk tools ``jppm download-tools`` and run ``jppm start``
 
 ## screenshots
