@@ -1,0 +1,14 @@
+{
+  "windows" : {
+    "url" : "https://dl.google.com/android/repository/sdk-tools-windows-4333796.zip",
+    "name" : "sdk-tools-win.zip"
+  },
+  "linux" : {
+    "url" : "https://dl.google.com/android/repository/sdk-tools-darwin-4333796.zip",
+    "name" : "sdk-tools-linux.zip"
+  },
+  "mac" : {
+    "url" : "https://dl.google.com/android/repository/sdk-tools-linux-4333796.zip",
+    "name" : "sdk-tools-mac.zip"
+  }
+}
