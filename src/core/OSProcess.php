@@ -11,7 +11,8 @@ class OSProcess extends Process
     {
         if (SDKManager::getInstance()->isWin())
             $command = "cmd.exe /c " . $command;
-
-        parent::__construct(str::split($command, " "), $directory, $environment);
+        $proc = parent::__construct(str::split($command, " "), $directory, $environment);
+        $this->start();
+		
     }
 }
